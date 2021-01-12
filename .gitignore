@@ -1,1 +1,10 @@
 node_modules
+
+out/
+
+*.env
+*.env*
+
+*.virgil*
+
+.DS_Store

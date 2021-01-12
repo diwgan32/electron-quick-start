@@ -1,20 +1,28 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const { loginUserHelper } = require('./helpers/auth.js')
+const ffmpeg_static = require('ffmpeg-static-electron');
+
+const { app, BrowserWindow, ipcMain } = require('electron')
+
 const path = require('path')
 
+let mainWindow;
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      nodeIntegration: false, // is default value after Electron v5
+      contextIsolation: true, // protect against prototype pollution
+      enableRemoteModule: false, // turn off remote
+      preload: path.join(__dirname, "preload.js") // use a preload script
     }
   })
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
-
+  console.log(ffmpeg_static.path)
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 }
@@ -38,6 +46,21 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
+
+ipcMain.on("toMain", (event, args) => {
+  loginUserHelper("diwakar@tumeke.io", "asdfasdf").then( (val) => {
+    if (val) {
+      mainWindow.webContents.send("fromMain", val);
+    } else {
+      mainWindow.webContents.send("fromMain", "done logging in");
+    }
+    
+  })
+});
+
+ipcMain.on("getPath", (event, args) => {
+  mainWindow.webContents.send("returnedPath", "test " + ffmpeg_static.path)
+});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
