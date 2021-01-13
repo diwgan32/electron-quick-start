@@ -11,7 +11,7 @@ const { exec, spawn } = require("child_process");
 ipcMain.on("nav", (event, loc) => {
   const mainWindow = BrowserWindow.getFocusedWindow();
   try {
-      if (fs.existsSync(loc)) mainWindow.loadFile(loc)
+      if (fs.existsSync(app.getAppPath()+"/"+loc)) mainWindow.loadFile(app.getAppPath()+"/"+loc)
       else mainWindow.webContents.send("loginError", "file not found")
   } catch (e) {
       mainWindow.webContents.send("loginError", String(e))
@@ -32,6 +32,11 @@ ipcMain.on("loginRequest", (event, args) => {
     }
     
   })
+});
+
+ipcMain.on("pathRequest", (event, args) => {
+  const mainWindow = BrowserWindow.getFocusedWindow();
+  mainWindow.webContents.send("loginError", app.getAppPath());
 });
 
 ipcMain.on("ffmpegRequest", (event, loc) => {

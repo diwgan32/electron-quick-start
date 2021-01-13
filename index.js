@@ -12,6 +12,8 @@ document.getElementById("loginButton").addEventListener("click", loginButtonHand
 document.getElementById("loginForm").addEventListener("submit", loginFormHandler);
 // --------------
 
+window.api.send("pathRequest",  "")
+
 
 function loginButtonHandler() {
 	const loginSpinner = document.getElementById('loginSpinner');

@@ -24,7 +24,7 @@ contextBridge.exposeInMainWorld(
 
         send: (channel, data) => {
             // whitelist channels
-            let validChannels = ["loginRequest", "ffmpegRequest", "nav"];
+            let validChannels = ["loginRequest", "ffmpegRequest", "nav", "pathRequest"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
