@@ -28,13 +28,16 @@
     "electron": "^11.1.1"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-pro": "^5.15.1",
     "@virgilsecurity/e3kit-node": "^2.4.1",
     "amazon-cognito-identity-js": "^4.5.6",
     "axios": "^0.21.1",
+    "bootstrap": "^5.0.0-beta1",
     "cross-fetch": "^3.0.6",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^6.0.1",
     "ffmpeg-static-electron": "^2.0.1",
+    "ffprobe-static-electron": "^2.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "tumeke-database": "git+https://github.com/diwgan32/tumeke-database.git"
   },

@@ -5,16 +5,46 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="./node_modules/@fortawesome/fontawesome-pro/css/all.css">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
     <title>Hello World!</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
-    <h2 id="sample_text"></h2>
-    <h2 id="path_text"></h2>
+    
+    <div class="container-sm p-5">
+      <div class="imgcontainer">
+        <img src="assets/logo.svg" alt="logo" class="logo">
+      </div>
+      <form id="loginForm">
+        <div class="container">
+          <label for="loginEmail"><b>Username</b></label>
+          <input type="email" class="form-control" placeholder="Enter Username" id="loginEmail" required>
+
+          <label for="loginPassword"><b>Password</b></label>
+          <input type="password" class="form-control" placeholder="Enter Password" id="loginPassword" required>
+          
+          <div class="d-grid gap-2">
+            <button
+              type="submit"
+              class="btn btn-primary mt-2 mb-2"
+              id="loginButton">
+              Login <i class="login-spinner fas fa-spin fa-spinner-third " id="loginSpinner"></i>
+            </button>
+          </div>
+
+          </button>
+         
+        </div>
+
+        
+      </form>
+    </div>
+
     <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
+    
   </body>
+  <script src="./index.js"></script>
 </html>
+
+

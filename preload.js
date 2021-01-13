@@ -24,13 +24,13 @@ contextBridge.exposeInMainWorld(
 
         send: (channel, data) => {
             // whitelist channels
-            let validChannels = ["toMain", "getPath"];
+            let validChannels = ["loginRequest", "ffmpegRequest", "nav"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
         },
         receive: (channel, func) => {
-            let validChannels = ["fromMain", "returnedPath"];
+            let validChannels = ["loginSuccess", "returnedPath", "ffmpegStatus"];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender` 
                 ipcRenderer.on(channel, (event, ...args) => func(...args));

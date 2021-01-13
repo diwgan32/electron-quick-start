@@ -5,6 +5,7 @@ const ffmpeg_static = require('ffmpeg-static-electron');
 const { app, BrowserWindow, ipcMain } = require('electron')
 
 const path = require('path')
+require("./ipc.js")
 
 let mainWindow;
 function createWindow () {
@@ -47,20 +48,6 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-ipcMain.on("toMain", (event, args) => {
-  loginUserHelper("diwakar@tumeke.io", "asdfasdf").then( (val) => {
-    if (val) {
-      mainWindow.webContents.send("fromMain", val);
-    } else {
-      mainWindow.webContents.send("fromMain", "done logging in");
-    }
-    
-  })
-});
-
-ipcMain.on("getPath", (event, args) => {
-  mainWindow.webContents.send("returnedPath", "test " + ffmpeg_static.path)
-});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

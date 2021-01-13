@@ -69,7 +69,6 @@ const decryptAESKeysHelper = async (user, company, password) => {
     console.log("Initialized? " + isVirgilInitialized())
     if (isVirgilInitialized()) {
         try {
-            console.log("User: " + JSON.stringify(state.authUser.user));
             const decryptedKeys = await decryptAESKeys(user, company);
             console.log("Decrypt: " + decryptedKeys);
             console.log("calling dispatch with callback");
