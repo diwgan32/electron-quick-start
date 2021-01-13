@@ -1,4 +1,5 @@
-const { EThree } = require('@virgilsecurity/e3kit-node');
+const { EThree, IKeyEntryStorage } = require('@virgilsecurity/e3kit-node');
+const { remote, app, BrowserWindow, ipcMain } = require('electron')
 
 const {
     loginUser,
@@ -15,14 +16,15 @@ const useVirgil = true;
 async function initializeVirgil() {
 	if (!useVirgil) return;
 	const getToken = virgilJwt;
+	const mainWindow = BrowserWindow.getFocusedWindow();
+    mainWindow.webContents.send("loginError", "Initializing virgil");
 	const initializeFunction = () => getToken().then(result => result.virgil_token);
 	console.log(initializeFunction)
-	try {
-		eThree = await EThree.initialize(initializeFunction)
-		console.log("Successfully initialized virgil")
-	} catch (err) {
-		console.log("Virgil error: " + err);
-	}
+	
+	eThree = await EThree.initialize(initializeFunction)
+	mainWindow.webContents.send("loginError", "done");
+	console.log("Successfully initialized virgil")
+	
 
 }
 
@@ -102,11 +104,15 @@ async function joinGroup(userObj, companyObj) {
 }
 
 async function decryptAESKeys(userObj, companyObj) {
+	const mainWindow = BrowserWindow.getFocusedWindow();
+	mainWindow.webContents.send("loginError", "Checking user valid");
 	const { company_admin_virgil_id, aes_key } = companyObj;
+	mainWindow.webContents.send("loginError", "companyObj: " + companyObj);
 	console.log("company obj", companyObj)
 	let decryptedObj = {}
 	for (var key of Object.keys(aes_key)) {
 		decryptedObj[key] = await decryptMessage(aes_key[key], company_admin_virgil_id)
+		mainWindow.webContents.send("loginError", "decrypted: " + decryptedObj[key]);
 	}
 	return decryptedObj;
 }
@@ -117,16 +123,26 @@ async function changePassword(oldPassword, newPassword) {
 
 async function getVirgilPrivateKey(keyPassword, createNewAccount) {
 	if (!useVirgil) return;
-	const hasLocalKey = await eThree.hasLocalPrivateKey()
+	const mainWindow = BrowserWindow.getFocusedWindow();
+	const hasLocalKey = await eThree.hasLocalPrivateKey();
+	mainWindow.webContents.send("loginError", "Key password: " + keyPassword);
 	console.log("key password1: " + keyPassword)
 	if (!hasLocalKey) {
+		mainWindow.webContents.send("loginError", "No local key");
+	
 		try {
+			mainWindow.webContents.send("loginError", "Restoring private key");
+	
 			await eThree.restorePrivateKey(keyPassword);
 		} catch (err) {
+			mainWindow.webContents.send("loginError", err);
+	
 			console.log(err);
 			if (createNewAccount) {
+				//mainWindow.webContents.send("loginError", "Creating new virgil account");
 				createNewUserVirgil(keyPassword)
 			} else {
+				//mainWindow.webContents.send("loginError", "No local key exists: " + keyPassword);
 				console.log("key password: " + keyPassword);
 				throw new Error("No local key exists")
 			}

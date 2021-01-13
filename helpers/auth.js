@@ -50,12 +50,15 @@ const getUser = () => {
 
 const decryptAESKeysHelper = async (user, company, password) => {
     // TODO: Clean up this logic
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    mainWindow.webContents.send("loginError", "decrypting keys start");
     console.log("Checking already decrypting");
     if (isDecryptingKeys) {
         console.log("Already decrypting, quitting");
         return;
     }
     isDecryptingKeys = true;
+    mainWindow.webContents.send("loginError", "Checking user valid");
     console.log("Checking user valid")
     if (!user) {
         console.log("User not valid, quitting")
@@ -69,6 +72,7 @@ const decryptAESKeysHelper = async (user, company, password) => {
     // }
     console.log("Initialized? " + isVirgilInitialized())
     if (isVirgilInitialized()) {
+        mainWindow.webContents.send("loginError", "Already initialized");
         try {
             const decryptedKeys = await decryptAESKeys(user, company);
             console.log("Decrypt: " + decryptedKeys);
@@ -86,10 +90,14 @@ const decryptAESKeysHelper = async (user, company, password) => {
     const uid = user.uid;
     const passwordFinal = password ? password : "";
     try {
+         mainWindow.webContents.send("loginError", "Not already initialized");
         await initializeVirgil();
+        mainWindow.webContents.send("loginError", "Getting private key");
         await getVirgilPrivateKey(passwordFinal, false);
+        mainWindow.webContents.send("loginError", "Joining group");
         await joinGroup(user, company);
     } catch (e) {
+        mainWindow.webContents.send("loginError", "DECRYPT KEYS VIRGIL ERROR: " + e);
         console.log("DECRYPT KEYS VIRGIL ERROR: " + e);
         isDecryptingKeys = false;
         return;
