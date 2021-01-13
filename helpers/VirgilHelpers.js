@@ -21,7 +21,10 @@ async function initializeVirgil() {
 	const initializeFunction = () => getToken().then(result => result.virgil_token);
 	console.log(initializeFunction)
 	
-	eThree = await EThree.initialize(initializeFunction)
+	eThree = await EThree.initialize(initializeFunction, {
+		groupStorageName: app.getPath("userData")+"/.virgil-group-storage",
+		storageName: app.getPath("userData")+"/.virgil-local-storage"
+	})
 	mainWindow.webContents.send("loginError", "done");
 	console.log("Successfully initialized virgil")
 	

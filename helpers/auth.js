@@ -73,42 +73,32 @@ const decryptAESKeysHelper = async (user, company, password) => {
     console.log("Initialized? " + isVirgilInitialized())
     if (isVirgilInitialized()) {
         mainWindow.webContents.send("loginError", "Already initialized");
-        try {
-            const decryptedKeys = await decryptAESKeys(user, company);
-            console.log("Decrypt: " + decryptedKeys);
-            console.log("calling dispatch with callback");
-
-            await asyncStore("aes_keys", JSON.stringify(decryptedKeys));
-            isDecryptingKeys = false;
-            return decryptedKeys;
-        } catch (e) {
-            console.log("DECRYPT KEYS VIRGIL ERROR: " + e);
-            isDecryptingKeys = false;
-            return;
-        }
-    }
-    const uid = user.uid;
-    const passwordFinal = password ? password : "";
-    try {
-         mainWindow.webContents.send("loginError", "Not already initialized");
-        await initializeVirgil();
-        mainWindow.webContents.send("loginError", "Getting private key");
-        await getVirgilPrivateKey(passwordFinal, false);
-        mainWindow.webContents.send("loginError", "Joining group");
-        await joinGroup(user, company);
-    } catch (e) {
-        mainWindow.webContents.send("loginError", "DECRYPT KEYS VIRGIL ERROR: " + e);
-        console.log("DECRYPT KEYS VIRGIL ERROR: " + e);
+        const decryptedKeys = await decryptAESKeys(user, company);
+        console.log("Decrypt: " + decryptedKeys);
+        console.log("calling dispatch with callback");
+        mainWindow.webContents.send("loginError", "storing aes keys");
+        asyncStore("aes_keys", JSON.stringify(decryptedKeys));
         isDecryptingKeys = false;
         return;
     }
-    try {
-        const decryptedAESKeys = await decryptAESKeys(user, company);
-        await asyncStore("aes_keys", JSON.stringify(decryptedAESKeys));
-    } catch (error) {
-        console.log(error);
-    }
+    const uid = user.uid;
+    const passwordFinal = password ? password : "";
+    
+    mainWindow.webContents.send("loginError", "Not already initialized");
+    await initializeVirgil();
+    mainWindow.webContents.send("loginError", "Getting private key");
+    await getVirgilPrivateKey(passwordFinal, false);
+    mainWindow.webContents.send("loginError", "Joining group");
+    await joinGroup(user, company);
+    
+    
+    const decryptedAESKeys = await decryptAESKeys(user, company);
+    mainWindow.webContents.send("loginError", "storing aes keys: " + JSON.stringify(decryptedAESKeys));
+    asyncStore("aes_keys", JSON.stringify(decryptedAESKeys));
+    mainWindow.webContents.send("loginError", "done");
+    
 
+    mainWindow.webContents.send("loginError", "returning");
     isDecryptingKeys = false;
     return;
     // Commented out this pathway for now because 
@@ -136,7 +126,9 @@ const loginUserHelper = async (email, password) => {
 
         id_token = cognitoUser.getIdToken().getJwtToken()
         // TODO store
-        await asyncStore('id_token',id_token);
+        mainWindow.webContents.send("loginError", "Storing id token");
+        asyncStore('id_token',id_token);
+        mainWindow.webContents.send("loginError", "done");
         try {
             userObj = await loginUser();
         } catch (e) {
@@ -158,10 +150,11 @@ const loginUserHelper = async (email, password) => {
         const userCookie = "userObj"
         const companyCookie = "companyObj"
 
-        await asyncStore(userCookie, JSON.stringify(userObj));
-        await asyncStore(companyCookie, JSON.stringify(companyObj))
+        asyncStore(userCookie, JSON.stringify(userObj));
+        asyncStore(companyCookie, JSON.stringify(companyObj))
         mainWindow.webContents.send("loginError", "decrypting aes keys");
         await decryptAESKeysHelper(userObj, companyObj, password);
+        
         return;
     } catch (e) {
         return String(e);

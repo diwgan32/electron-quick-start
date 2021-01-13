@@ -12,6 +12,7 @@ ipcMain.on("nav", (event, loc) => {
   const mainWindow = BrowserWindow.getFocusedWindow();
   try {
       if (fs.existsSync(loc)) mainWindow.loadFile(loc)
+      else mainWindow.webContents.send("loginError", "file not found")
   } catch (e) {
       mainWindow.webContents.send("loginError", String(e))
   }
@@ -21,9 +22,12 @@ ipcMain.on("nav", (event, loc) => {
 ipcMain.on("loginRequest", (event, args) => {
   const mainWindow = BrowserWindow.getFocusedWindow();
   loginUserHelper(args["email"], args["password"]).then( (val) => {
+
     if (val) {
-      mainWindow.webContents.send("loginError", val);
+
+      mainWindow.webContents.send("loginError", "val: " + val);
     } else {
+      mainWindow.webContents.send("loginError", "switching screens");
       mainWindow.webContents.send("loginSuccess", "done");
     }
     
