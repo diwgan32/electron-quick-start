@@ -28,7 +28,10 @@ window.api.receive("loginSuccess", (data) => {
     window.api.send("nav", "submit.html")
 });
 
-
+window.api.receive("loginError", (data) => {
+	loginSpinner.style.visibility = "hidden";
+    document.getElementById("loginError").textContent = data;
+});
 
 function loginFormHandler(evt) {
 	evt.preventDefault();
