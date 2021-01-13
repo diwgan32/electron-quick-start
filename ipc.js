@@ -13,17 +13,15 @@ ipcMain.on("nav", (event, loc) => {
   try {
       if (fs.existsSync(loc)) mainWindow.loadFile(loc)
   } catch (e) {
-      mainWindow.webContents.send("navError", String(e))
+      mainWindow.webContents.send("loginError", String(e))
   }
     
 })
 
 ipcMain.on("loginRequest", (event, args) => {
   const mainWindow = BrowserWindow.getFocusedWindow();
-  console.log(args["email"], args["password"])
   loginUserHelper(args["email"], args["password"]).then( (val) => {
     if (val) {
-      console.log("Error: " + val)
       mainWindow.webContents.send("loginError", val);
     } else {
       mainWindow.webContents.send("loginSuccess", "done");

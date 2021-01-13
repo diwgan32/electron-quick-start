@@ -1,4 +1,5 @@
 const Store = require('electron-store');
+const { remote, app, BrowserWindow, ipcMain } = require('electron')
 
 const {
   cognitoAuthUser,
@@ -110,6 +111,8 @@ const decryptAESKeysHelper = async (user, company, password) => {
 
 const loginUserHelper = async (email, password) => {
     console.log("In login saga")
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    mainWindow.webContents.send("loginError", "In login saga");
     let cognitoUser = null;
     let user = null;
     let userObj = null;
@@ -117,6 +120,7 @@ const loginUserHelper = async (email, password) => {
     let id_token = null;
     try {
         cognitoUser = await cognitologinWithEmailPasswordAsync(email, password);
+        mainWindow.webContents.send("loginError", "cognito logged in");
         if (cognitoUser.message) {
           return cognitoUser.message;
         }
@@ -134,7 +138,7 @@ const loginUserHelper = async (email, password) => {
             }
             return "Login error"
         }
-        
+        mainWindow.webContents.send("loginError", "db logged in");
         if (userObj.role === "none" || userObj.role === "rejected") {
             return "User not authorized to access this app."
         }
@@ -145,8 +149,10 @@ const loginUserHelper = async (email, password) => {
         console.log('userObj',userObj)
         const userCookie = "userObj"
         const companyCookie = "companyObj"
+
         await asyncStore(userCookie, JSON.stringify(userObj));
         await asyncStore(companyCookie, JSON.stringify(companyObj))
+        mainWindow.webContents.send("loginError", "decrypting aes keys");
         await decryptAESKeysHelper(userObj, companyObj, password);
         return;
     } catch (e) {
